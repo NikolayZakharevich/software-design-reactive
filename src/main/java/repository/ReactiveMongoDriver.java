@@ -3,7 +3,7 @@ package repository;
 import com.mongodb.rx.client.MongoClient;
 import com.mongodb.rx.client.MongoClients;
 import com.mongodb.rx.client.Success;
-import model.Good;
+import model.Product;
 import model.User;
 import org.bson.Document;
 import rx.Observable;
@@ -27,8 +27,8 @@ public class ReactiveMongoDriver {
         return addToCollection(COLLECTION_USER, user.getDocument());
     }
 
-    public static Success createGood(Good good) {
-        return addToCollection(COLLECTION_GOOD, good.getDocument());
+    public static Success createGood(Product product) {
+        return addToCollection(COLLECTION_GOOD, product.getDocument());
     }
 
     public static Observable<User> getUserById(Integer userId) {
@@ -46,7 +46,7 @@ public class ReactiveMongoDriver {
                         .getCollection(COLLECTION_GOOD)
                         .find()
                         .toObservable()
-                        .map(d -> new Good(d).toString(user.currency))
+                        .map(doc -> new Product(doc).toString(user.currency))
                         .reduce((lhs, rhs) -> lhs + ", " + rhs)
                 );
     }
