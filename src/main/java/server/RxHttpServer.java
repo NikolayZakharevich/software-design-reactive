@@ -24,14 +24,14 @@ public class RxHttpServer {
     public static final String PARAM_CURRENCY = "currency";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_PRODUCT_ID = "productId";
-    public static final String PARAM_RUB = Currency.RUB_NAME;
     public static final String PARAM_USD = Currency.USD_NAME;
     public static final String PARAM_EUR = Currency.EUR_NAME;
+    public static final String PARAM_RUB = Currency.RUB_NAME;
 
     public static final String MESSAGE_REGISTER_USER_SUCCESS = "Successfully registered new user";
     public static final String MESSAGE_REGISTER_USER_FAIL = "Failed to save new user to database";
-    public static final String MESSAGE_ADD_PRODUCT_SUCCESS = "Successfully added new good";
-    public static final String MESSAGE_ADD_PRODUCT_FAIL = "Failed to add good to database";
+    public static final String MESSAGE_ADD_PRODUCT_SUCCESS = "Successfully added new product";
+    public static final String MESSAGE_ADD_PRODUCT_FAIL = "Failed to add product to database";
 
     public static final String MESSAGE_METHOD_NOT_FOUND = "Method `%s` not found";
     public static final String MESSAGE_MISSING_REQUIRED_PARAMS = "Missing required parameters: `%s`";
@@ -51,10 +51,10 @@ public class RxHttpServer {
                             messageAndStatus = registerUser(queryParams);
                             break;
                         case METHOD_ADD_PRODUCT:
-                            messageAndStatus = addGood(queryParams);
+                            messageAndStatus = addProduct(queryParams);
                             break;
                         case METHOD_GET_PRODUCTS:
-                            messageAndStatus = getGoods(queryParams);
+                            messageAndStatus = getProducts(queryParams);
                             break;
                         default:
                             messageAndStatus = new Pair<>(
@@ -83,7 +83,7 @@ public class RxHttpServer {
         return wrapSuccess(success, MESSAGE_REGISTER_USER_SUCCESS, MESSAGE_REGISTER_USER_FAIL);
     }
 
-    public static Pair<Observable<String>, HttpResponseStatus> addGood(Map<String, List<String>> queryParams) {
+    public static Pair<Observable<String>, HttpResponseStatus> addProduct(Map<String, List<String>> queryParams) {
         List<String> missingParams = getMissingRequiredParams(queryParams,
                 Stream.of(PARAM_PRODUCT_ID, PARAM_NAME, PARAM_RUB, PARAM_USD, PARAM_EUR));
         if (!missingParams.isEmpty()) {
@@ -92,26 +92,26 @@ public class RxHttpServer {
 
         int productId = Integer.parseInt(queryParams.get(PARAM_PRODUCT_ID).get(0));
         String name = queryParams.get(PARAM_NAME).get(0);
-        String rub = queryParams.get(PARAM_RUB).get(0);
         String usd = queryParams.get(PARAM_USD).get(0);
         String eur = queryParams.get(PARAM_EUR).get(0);
+        String rub = queryParams.get(PARAM_RUB).get(0);
 
-        Success success = ReactiveMongoDriver.createGood(new Product(productId, name, rub, usd, eur));
+        Success success = ReactiveMongoDriver.createProduct(new Product(productId, name, usd, eur, rub));
         return wrapSuccess(success, MESSAGE_ADD_PRODUCT_SUCCESS, MESSAGE_ADD_PRODUCT_FAIL);
     }
 
-    public static Pair<Observable<String>, HttpResponseStatus> getGoods(Map<String, List<String>> queryParams) {
+    public static Pair<Observable<String>, HttpResponseStatus> getProducts(Map<String, List<String>> queryParams) {
         List<String> missingParams = getMissingRequiredParams(queryParams, Stream.of(PARAM_USER_ID));
         if (!missingParams.isEmpty()) {
             return wrapErrorMissingRequired(missingParams);
         }
 
         Integer userId = Integer.valueOf(queryParams.get(PARAM_USER_ID).get(0));
-        Observable<String> goods = ReactiveMongoDriver.getGoods(userId);
+        Observable<String> products = ReactiveMongoDriver.getProducts(userId);
 
         return new Pair<>(
                 Observable.just("{ userId = " + userId + ", products = [")
-                        .concatWith(goods)
+                        .concatWith(products)
                         .concatWith(Observable.just("]}")),
                 HttpResponseStatus.OK
         );
@@ -119,7 +119,7 @@ public class RxHttpServer {
 
     private static List<String> getMissingRequiredParams(Map<String, List<String>> queryParams, Stream<String> required) {
         return required
-                .filter(val -> !queryParams.containsKey(val))
+                .filter(param -> !queryParams.containsKey(param))
                 .collect(Collectors.toList());
     }
 

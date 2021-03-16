@@ -19,7 +19,7 @@ public class ReactiveMongoDriver {
     private final static String DATABASE_RXTEXT = "rxtest";
 
     private final static String COLLECTION_USER = "user";
-    private final static String COLLECTION_GOOD = "good";
+    private final static String COLLECTION_PRODUCT = "product";
 
     private final static int TIMEOUT = 10;
 
@@ -27,8 +27,8 @@ public class ReactiveMongoDriver {
         return addToCollection(COLLECTION_USER, user.getDocument());
     }
 
-    public static Success createGood(Product product) {
-        return addToCollection(COLLECTION_GOOD, product.getDocument());
+    public static Success createProduct(Product product) {
+        return addToCollection(COLLECTION_PRODUCT, product.getDocument());
     }
 
     public static Observable<User> getUserById(Integer userId) {
@@ -40,10 +40,10 @@ public class ReactiveMongoDriver {
                 .map(User::new);
     }
 
-    public static Observable<String> getGoods(Integer userId) {
+    public static Observable<String> getProducts(Integer userId) {
         return getUserById(userId)
                 .flatMap(user -> client.getDatabase(DATABASE_RXTEXT)
-                        .getCollection(COLLECTION_GOOD)
+                        .getCollection(COLLECTION_PRODUCT)
                         .find()
                         .toObservable()
                         .map(doc -> new Product(doc).toString(user.currency))
