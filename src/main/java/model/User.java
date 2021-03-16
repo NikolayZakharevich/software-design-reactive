@@ -13,7 +13,7 @@ public class User {
     public final int currency;
 
     public User(Document doc) {
-        this(doc.getInteger(FIELD_USER_ID), doc.getString(FIELD_NAME), Integer.parseInt(doc.getString(FIELD_CURRENCY)));
+        this(doc.getInteger(FIELD_USER_ID), doc.getString(FIELD_NAME), doc.getInteger(FIELD_CURRENCY));
     }
 
     public User(int userId, String name, int currency) {

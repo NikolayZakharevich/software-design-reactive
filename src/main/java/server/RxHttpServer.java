@@ -7,6 +7,7 @@ import model.Good;
 import repository.ReactiveMongoDriver;
 import model.User;
 import rx.Observable;
+import util.Currency;
 import util.Pair;
 
 import java.util.*;
@@ -22,9 +23,9 @@ public class RxHttpServer {
     public static final String PARAM_CURRENCY = "currency";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_GOOD_ID = "goodId";
-    public static final String PARAM_RUB = "rub";
-    public static final String PARAM_USD = "usd";
-    public static final String PARAM_EUR = "eur";
+    public static final String PARAM_RUB = Currency.RUB_NAME;
+    public static final String PARAM_USD = Currency.USD_NAME;
+    public static final String PARAM_EUR = Currency.EUR_NAME;
 
     public static final String MESSAGE_REGISTER_USER_SUCCESS = "Successfully registered new user";
     public static final String MESSAGE_REGISTER_USER_FAIL = "Failed to save new user to database";
@@ -75,7 +76,8 @@ public class RxHttpServer {
 
         int id = Integer.parseInt(queryParam.get(PARAM_USER_ID).get(0));
         String name = queryParam.get(PARAM_NAME).get(0);
-        int currency = Integer.parseInt(queryParam.get(PARAM_CURRENCY).get(0));
+        String currencyName = queryParam.get(PARAM_CURRENCY).get(0);
+        int currency = Currency.currencyNameToCurrency(currencyName);
 
         Success success = ReactiveMongoDriver.createUser(new User(id, name, currency));
         return wrapSuccess(success, MESSAGE_REGISTER_USER_SUCCESS, MESSAGE_REGISTER_USER_FAIL);

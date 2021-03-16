@@ -4,7 +4,7 @@ import org.bson.Document;
 
 import java.util.*;
 
-import static service.Currency.*;
+import static util.Currency.*;
 
 public class Good {
     private static final String FIELD_GOOD_ID = "goodId";
@@ -40,33 +40,11 @@ public class Good {
         return document;
     }
 
-    public String priceString(int currency) {
-        return currencyMap.get(currency);
-    }
-
-    public String priceString() {
-        StringBuilder pricesBuilder = new StringBuilder();
-        for (Map.Entry<Integer, String> price : currencyMap.entrySet()) {
-            pricesBuilder.append(price.getKey()).append(": ").append(price.getValue()).append(", ");
-        }
-        String prices = pricesBuilder.toString();
-        return prices.substring(0, prices.length() - 2);
-    }
-
-    public String genericString(String priceString) {
+    public String toString(int currency) {
         return "Good{" +
                 "goodId=" + goodId +
                 ", name='" + name + '\'' +
-                ", price=" + priceString +
+                ", price=" + currencyMap.get(currency) +
                 '}';
-    }
-
-    public String toString(int currency) {
-        return genericString(priceString(currency));
-    }
-
-    @Override
-    public String toString() {
-        return genericString(priceString());
     }
 }
